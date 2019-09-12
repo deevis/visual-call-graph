@@ -38,7 +38,7 @@ class GraphManager
     if @options[:show_path]
       "#{class_and_method}\n#{event.path}".freeze
     elsif @options[class_and_method] # this should be a lambda
-      value = @options[class_and_method].call(event.binding)
+      value = @options[class_and_method].call(event.binding, @options[:exclude_path_contains])
       "#{class_and_method}\n#{value}".freeze
     else
       class_and_method.freeze

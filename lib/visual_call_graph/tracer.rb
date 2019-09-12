@@ -58,7 +58,7 @@ class Tracer
       when :return
         @graph.pop
       when :call
-        puts "TRACING: #{event.path}"
+        # puts "TRACING: #{event.path}"
         @graph.add_edges(event)
       end
     }
