@@ -7,14 +7,14 @@ module VisualCallGraph
 
   @@sql_formatter=->(binding, exclude_caller_path_contains) do 
     value = binding.eval("sql")
-    value.gsub!("INNER", "\nINNER")
-    value.gsub!("FROM", "\nFROM")
-    value.gsub!("WHERE", "\nWHERE")
-    value.gsub!("ORDER", "\nORDER")
-    value.gsub!("LEFT", "\nLEFT")
-    value.gsub!("AND", "\nAND")
-    value.gsub!("\n\n","\n")
-    value.gsub!("\\\"", "'")
+    value = value.gsub("INNER", "\nINNER")
+    value = value.gsub("FROM", "\nFROM")
+    value = value.gsub("WHERE", "\nWHERE")
+    value = value.gsub("ORDER", "\nORDER")
+    value = value.gsub("LEFT", "\nLEFT")
+    value = value.gsub("AND", "\nAND")
+    value = value.gsub("\n\n","\n")
+    value = value.gsub("\\\"", "'").squish
     if value.length > 512 
       value = value[0,512] + "..."
     end
