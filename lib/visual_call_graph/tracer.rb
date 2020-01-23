@@ -30,12 +30,17 @@ class Tracer
   def build_tracer(options={})
     include_path_contains = options[:include_path_contains]
     exclude_path_contains = options[:exclude_path_contains]
+    registered_lambda_keys = (options[:registered_lambdas] || {}).keys
+    puts "Tracing with registered_lambdas: #{registered_lambda_keys}"
     TracePoint.new(:call, :return) { |event|
       # Avoid tracing myself...
       next if  event.defined_class == self.class
       # Ensure include_path_contains run first and will avoid exclude rules
       include_matched = false
-      if !include_path_contains.nil?
+      # auto-include if the class#method has a lambda registered...
+      include_matched = registered_lambda_keys.include?("#{event.defined_class.to_s}##{event.method_id}")
+      puts "Including due to lambda: #{event.defined_class.to_s}##{event.method_id}" if include_matched
+      if !include_matched && !include_path_contains.nil?
         include_path_contains.each do |always_include_paths_containing_this|
           if event.path.include?(always_include_paths_containing_this)
             include_matched = true

@@ -5,6 +5,11 @@ require 'visual_call_graph/tracer'
 module VisualCallGraph
   extend self
 
+  @@cache_formatter=->(binding, exclude_caller_path_contains) do 
+    value = binding.eval("name")
+    return value
+  end
+
   @@sql_formatter=->(binding, exclude_caller_path_contains) do 
     value = binding.eval("sql")
     value = value.gsub("INNER", "\nINNER")
@@ -50,7 +55,11 @@ module VisualCallGraph
     end
 
     if options[:use_rails_config] == true 
-      options["Mysql2::Client#query"] ||= @@sql_formatter
+      options[:registered_lambdas] = {
+        "Mysql2::Client#query" => @@sql_formatter,
+        "ActiveSupport::Cache::Store#fetch" => @@cache_formatter,
+        "ActiveSupport::Cache::Store#read" => @@cache_formatter
+      }
       options[:include_path_contains] ||=  ["mysql2/client"]
       options[:exclude_path_contains] ||=  [".rvm", "gems"]
     end
